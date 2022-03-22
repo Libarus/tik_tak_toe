@@ -2,6 +2,8 @@
 
 A new Flutter project.
 
+bla - bla - bla a lot of interesting text bla - bla - bla...
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
