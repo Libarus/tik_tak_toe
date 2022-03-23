@@ -2,7 +2,7 @@
 
 A new Flutter project.
 
-bla - bla - bla a lot of interesting text bla - bla - bla...
+bla - bla - bla a lot of interesting text bla - bla - bla... and one more interesting text ...
 
 ## Getting Started
 
