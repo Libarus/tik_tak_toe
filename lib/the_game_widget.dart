@@ -1,19 +1,96 @@
 import 'package:flutter/material.dart';
 import 'package:tik_tak_toe/text_styles.dart';
 
-import 'game_field_widget.dart';
+import 'button_style.dart';
+import 'field.dart';
 
 // Конвертировал в стейтфул виджет для того, чтобы отслеживать
 // текущий ход игрока и влиять из-за этого на всю игру
 
 class TheGameWidget extends StatefulWidget {
   const TheGameWidget({Key? key}) : super(key: key);
+
   @override
   State<TheGameWidget> createState() => _TheGameWidgetState();
 }
 
 class _TheGameWidgetState extends State<TheGameWidget> {
+
   int player = 1; // 1 - игрок Х, 2 - игрок О
+  List<int> field = List.generate(9, (index) => 0);
+
+  void reset(){
+    setState(() {fieldWidgets = List.generate(
+      9,
+          (index) => GridTile(
+        child: InkWell(
+          enableFeedback: true,
+          child: FieldWidget(drawType: field[index]),
+          onTap: () => _onTileClicked(index),
+        ),
+      ),
+    );
+    debugPrint('init state');
+
+    @override
+    Widget build(BuildContext context) {
+      return Center(
+        child: SizedBox(
+          height: 300,
+          width: 300,
+          child: GridView.count(
+            crossAxisCount: 3,
+            children: fieldWidgets, // №2
+          ),
+        ),
+      );
+    }});}
+
+  void _onTileClicked(int index) {
+    debugPrint("You tapped on item $index  $widget.player");
+    setState(() {
+      // заносим в список текущего игрока
+      field[index] = widget.player;
+
+      // начало
+      fieldWidgets = List.generate(
+        9,
+        (index) => GridTile(
+          child: InkWell(
+            enableFeedback: true,
+            child: FieldWidget(drawType: field[index]),
+            onTap: () => _onTileClicked(index),
+          ),
+        ),
+      );
+      // окончание, см.№1
+      fieldWidgets[index] = FieldWidget(drawType: field[index]); // (*)
+
+      widget.setStepPlayer(); // вызываем ф-ию, которую передали
+      // доступ к переданным переменным осуществляется через widget.<...>
+    });
+  }
+
+  List<Widget> fieldWidgets = List.generate(9, (index) => const Text('1'));
+
+  @override
+  void initState() {
+    super.initState();
+    // генерируем список из GridTile, чтобы можно было бы отслеживать
+    // нажатия по ячейке сетки через InkWell
+    // при тапе (onTap) вызываем _onTileClicked с индексом ячейки
+    fieldWidgets = List.generate(
+      9,
+      (index) => GridTile(
+        child: InkWell(
+          enableFeedback: true,
+          child: FieldWidget(drawType: field[index]),
+          onTap: () => _onTileClicked(index),
+        ),
+      ),
+    );
+    debugPrint('init state');
+  }
 
   // !! сделано, думаю, не оптимально
   // заводим статичный список стилей для надписи первого игрока
@@ -57,9 +134,15 @@ class _TheGameWidgetState extends State<TheGameWidget> {
           style: TextStyles.mainGameTextStyle,
         ),
         const SizedBox(height: 20),
-        GameFieldWidget(
-          player: player, // передаём в виджет текущего игрока - 1 или 2
-          setStepPlayer: changePlayerStep, // см.№1
+        Center(
+          child: SizedBox(
+            height: 300,
+            width: 300,
+            child: GridView.count(
+              crossAxisCount: 3,
+              children: fieldWidgets, // №2
+            ),
+          ),
         ),
         const SizedBox(height: 20),
         Padding(
@@ -77,7 +160,12 @@ class _TheGameWidgetState extends State<TheGameWidget> {
               ),
             ],
           ),
-        )
+        ),
+        ElevatedButton(
+          style: ButtonStyles.mainButtonStyle,
+          child: const Text('RESET'),
+          onPressed: () {},
+        ),
       ],
     );
   }
