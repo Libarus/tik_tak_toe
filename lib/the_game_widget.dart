@@ -15,82 +15,12 @@ class TheGameWidget extends StatefulWidget {
 }
 
 class _TheGameWidgetState extends State<TheGameWidget> {
-
   int player = 1; // 1 - игрок Х, 2 - игрок О
-  List<int> field = List.generate(9, (index) => 0);
 
-  void reset(){
-    setState(() {fieldWidgets = List.generate(
-      9,
-          (index) => GridTile(
-        child: InkWell(
-          enableFeedback: true,
-          child: FieldWidget(drawType: field[index]),
-          onTap: () => _onTileClicked(index),
-        ),
-      ),
-    );
-    debugPrint('init state');
-
-    @override
-    Widget build(BuildContext context) {
-      return Center(
-        child: SizedBox(
-          height: 300,
-          width: 300,
-          child: GridView.count(
-            crossAxisCount: 3,
-            children: fieldWidgets, // №2
-          ),
-        ),
-      );
-    }});}
-
-  void _onTileClicked(int index) {
-    debugPrint("You tapped on item $index  $widget.player");
-    setState(() {
-      // заносим в список текущего игрока
-      field[index] = widget.player;
-
-      // начало
-      fieldWidgets = List.generate(
-        9,
-        (index) => GridTile(
-          child: InkWell(
-            enableFeedback: true,
-            child: FieldWidget(drawType: field[index]),
-            onTap: () => _onTileClicked(index),
-          ),
-        ),
-      );
-      // окончание, см.№1
-      fieldWidgets[index] = FieldWidget(drawType: field[index]); // (*)
-
-      widget.setStepPlayer(); // вызываем ф-ию, которую передали
-      // доступ к переданным переменным осуществляется через widget.<...>
-    });
-  }
+  List<int> field = List.generate(9, (index) => 0); // может служить для
+  // проверки ходов и на 3 в ряд
 
   List<Widget> fieldWidgets = List.generate(9, (index) => const Text('1'));
-
-  @override
-  void initState() {
-    super.initState();
-    // генерируем список из GridTile, чтобы можно было бы отслеживать
-    // нажатия по ячейке сетки через InkWell
-    // при тапе (onTap) вызываем _onTileClicked с индексом ячейки
-    fieldWidgets = List.generate(
-      9,
-      (index) => GridTile(
-        child: InkWell(
-          enableFeedback: true,
-          child: FieldWidget(drawType: field[index]),
-          onTap: () => _onTileClicked(index),
-        ),
-      ),
-    );
-    debugPrint('init state');
-  }
 
   // !! сделано, думаю, не оптимально
   // заводим статичный список стилей для надписи первого игрока
@@ -110,6 +40,48 @@ class _TheGameWidgetState extends State<TheGameWidget> {
     TextStyles.playerOn
   ];
 
+  void reset() {
+    // верно. ты сделал функцию ресета
+    setState(() {
+      // сюда можно поместить блок определения первого ходящего
+      // player = 1 или 2
+
+      // сбрасывается содержание списка ходов
+      field = List.generate(9, (index) => 0);
+
+      // генерируем список из GridTile, чтобы можно было бы отслеживать
+      // нажатия по ячейке сетки через InkWell
+      // при тапе (onTap) вызываем _onTileClicked с индексом ячейки
+      fieldWidgets = List.generate(
+        9,
+        (index) => GridTile(
+          child: InkWell(
+            enableFeedback: true,
+            child: FieldWidget(drawType: field[index]),
+            onTap: () => _onTileClicked(index),
+          ),
+        ),
+      );
+      debugPrint('init state');
+
+      /* Это тут лишнее
+      @override
+      Widget build(BuildContext context) {
+        return Center(
+          child: SizedBox(
+            height: 300,
+            width: 300,
+            child: GridView.count(
+              crossAxisCount: 3,
+              children: fieldWidgets, // №2
+            ),
+          ),
+        );
+      }
+      */
+    });
+  }
+
   // функция изменения состояния игрока
   void changePlayerStep() {
     setState(() {
@@ -121,6 +93,63 @@ class _TheGameWidgetState extends State<TheGameWidget> {
       }
       debugPrint("player $player"); // дебаг надпись
     });
+  }
+
+  void _onTileClicked(int index) {
+    debugPrint("You tapped on item $index  $widget.player");
+    setState(() {
+      // заносим в список текущего игрока
+      field[index] = player;
+      // widget.player так как player уже в виджете, а не передаётся из вне,
+      // то используем уже просто player;
+
+      // начало
+      fieldWidgets = List.generate(
+        9,
+        (index) => GridTile(
+          child: InkWell(
+            enableFeedback: true,
+            child: FieldWidget(drawType: field[index]),
+            onTap: () => _onTileClicked(index),
+          ),
+        ),
+      );
+      // окончание, см.№1
+      fieldWidgets[index] = FieldWidget(drawType: field[index]); // (*)
+
+      // так как функция уже не передаётся, то вызываем непосредственно
+      // саму функцию из текущего места
+      changePlayerStep();
+      // widget.setStepPlayer(); // вызываем ф-ию, которую передали
+      // доступ к переданным переменным осуществляется через widget.<...>
+    });
+  }
+
+  // убрал отсюда перенёс наверх, для компоновки кода
+  // List<Widget> fieldWidgets = List.generate(9, (index) => const Text('1'));
+
+  @override
+  void initState() {
+    super.initState();
+    reset();
+    /* так как у нас есть функция reset,
+       то мы её тут и вызываем при инициализации
+
+    // генерируем список из GridTile, чтобы можно было бы отслеживать
+    // нажатия по ячейке сетки через InkWell
+    // при тапе (onTap) вызываем _onTileClicked с индексом ячейки
+    fieldWidgets = List.generate(
+      9,
+      (index) => GridTile(
+        child: InkWell(
+          enableFeedback: true,
+          child: FieldWidget(drawType: field[index]),
+          onTap: () => _onTileClicked(index),
+        ),
+      ),
+    );
+    debugPrint('init state');
+    */
   }
 
   @override
@@ -135,6 +164,7 @@ class _TheGameWidgetState extends State<TheGameWidget> {
         ),
         const SizedBox(height: 20),
         Center(
+          // то, что ты заменил вызов виджета кодом верно
           child: SizedBox(
             height: 300,
             width: 300,
@@ -164,7 +194,7 @@ class _TheGameWidgetState extends State<TheGameWidget> {
         ElevatedButton(
           style: ButtonStyles.mainButtonStyle,
           child: const Text('RESET'),
-          onPressed: () {},
+          onPressed: reset,
         ),
       ],
     );
