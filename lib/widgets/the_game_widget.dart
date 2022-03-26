@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tik_tak_toe/text_styles.dart';
+import 'package:tik_tak_toe/styles/text_styles.dart';
 
-import 'button_style.dart';
+import '../styles/button_style.dart';
 import 'field.dart';
 
 // Конвертировал в стейтфул виджет для того, чтобы отслеживать
@@ -52,16 +52,7 @@ class _TheGameWidgetState extends State<TheGameWidget> {
       // генерируем список из GridTile, чтобы можно было бы отслеживать
       // нажатия по ячейке сетки через InkWell
       // при тапе (onTap) вызываем _onTileClicked с индексом ячейки
-      fieldWidgets = List.generate(
-        9,
-        (index) => GridTile(
-          child: InkWell(
-            enableFeedback: true,
-            child: FieldWidget(drawType: field[index]),
-            onTap: () => _onTileClicked(index),
-          ),
-        ),
-      );
+      listGenerate();
       debugPrint('init state');
 
       /* Это тут лишнее
@@ -104,16 +95,7 @@ class _TheGameWidgetState extends State<TheGameWidget> {
       // то используем уже просто player;
 
       // начало
-      fieldWidgets = List.generate(
-        9,
-        (index) => GridTile(
-          child: InkWell(
-            enableFeedback: true,
-            child: FieldWidget(drawType: field[index]),
-            onTap: () => _onTileClicked(index),
-          ),
-        ),
-      );
+      listGenerate();
       // окончание, см.№1
       fieldWidgets[index] = FieldWidget(drawType: field[index]); // (*)
 
@@ -123,6 +105,11 @@ class _TheGameWidgetState extends State<TheGameWidget> {
       // widget.setStepPlayer(); // вызываем ф-ию, которую передали
       // доступ к переданным переменным осуществляется через widget.<...>
     });
+  }
+
+  //метод обработки нажатия на кнопку options
+  void onOptionsTap(){
+    Navigator.of(context).pushReplacementNamed('/options_widget');
   }
 
   // убрал отсюда перенёс наверх, для компоновки кода
@@ -151,52 +138,87 @@ class _TheGameWidgetState extends State<TheGameWidget> {
     debugPrint('init state');
     */
   }
+  //в отдельный метод выделил генерацию поля
+  void listGenerate() {
+    fieldWidgets = List.generate(
+      9,
+          (index) => GridTile(
+        child: InkWell(
+          enableFeedback: true,
+          child: FieldWidget(drawType: field[index]),
+          onTap: () => _onTileClicked(index),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const SizedBox(height: 20),
-        const Text(
-          'Score: 1:1',
+    return Scaffold(
+      backgroundColor: Colors.amberAccent,
+      appBar: AppBar(
+        backgroundColor: Colors.orangeAccent,
+        title: const Text(
+          'The Game',
           style: TextStyles.mainGameTextStyle,
         ),
-        const SizedBox(height: 20),
-        Center(
-          // то, что ты заменил вызов виджета кодом верно
-          child: SizedBox(
-            height: 300,
-            width: 300,
-            child: GridView.count(
-              crossAxisCount: 3,
-              children: fieldWidgets, // №2
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 20),
+          const Text(
+            'Score: 1:1',
+            style: TextStyles.mainGameTextStyle,
+          ),
+          const SizedBox(height: 20),
+          Center(
+            // то, что ты заменил вызов виджета кодом верно
+            child: SizedBox(
+              height: 300,
+              width: 300,
+              child: GridView.count(
+                crossAxisCount: 3,
+                children: fieldWidgets, // №2
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 20),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Игрок X',
+                  style: stylePlayer1[player], // (1)
+                ),
+                Text(
+                  'Игрок O',
+                  style: stylePlayer2[player], // (2)
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'Игрок X',
-                style: stylePlayer1[player], // (1)
+              ElevatedButton(
+                style: ButtonStyles.mainButtonStyle,
+                child: const Text('RESET'),
+                onPressed: reset,
               ),
-              Text(
-                'Игрок O',
-                style: stylePlayer2[player], // (2)
+              const SizedBox(width: 30,),
+              ElevatedButton(
+                style: ButtonStyles.mainButtonStyle,
+                child: const Text('OPTIONS'),
+                onPressed: onOptionsTap,
               ),
             ],
           ),
-        ),
-        ElevatedButton(
-          style: ButtonStyles.mainButtonStyle,
-          child: const Text('RESET'),
-          onPressed: reset,
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

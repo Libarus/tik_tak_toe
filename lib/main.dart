@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tik_tak_toe/text_styles.dart';
-import 'package:tik_tak_toe/the_game_widget.dart';
+import 'package:tik_tak_toe/styles/text_styles.dart';
+import 'package:tik_tak_toe/widgets/options_widget.dart';
+import 'package:tik_tak_toe/widgets/the_game_widget.dart';
 
 void main() {
   runApp(const MainGame());
@@ -14,21 +15,16 @@ class MainGame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false, // убирает debug из прав.верх угла
-      home: Scaffold(
-        backgroundColor: Colors.amberAccent,
-        appBar: AppBar(
-          backgroundColor: Colors.orangeAccent,
-          title: const Text(
-            'The Game',
-            style: TextStyles.mainGameTextStyle,
-          ),
-        ),
-        body: const TheGameWidget(), // см.внизу №1
-      ),
-    );
+        debugShowCheckedModeBanner: false, // убирает debug из прав.верх угла
+        routes: {
+          '/': (context) => const TheGameWidget(),
+          '/options_widget': (context) =>
+              const OptionsWidget(),
+        });
   }
 }
+/*Начал избавляться от кода в файле main, хорошая практика его тут минимизировать
+и использовать данный файл только, как точка запуска приложения*/
 
 /*
 №1 Вызываем виджет, который и отвечает за внутреннюю игру. Это также нам
