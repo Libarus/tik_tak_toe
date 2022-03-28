@@ -108,8 +108,8 @@ class _TheGameWidgetState extends State<TheGameWidget> {
   }
 
   //метод обработки нажатия на кнопку options
-  void onOptionsTap(){
-    Navigator.of(context).pushReplacementNamed('/options_widget');
+  void onOptionsTap() {
+    Navigator.of(context).pushNamed('options_widget');
   }
 
   // убрал отсюда перенёс наверх, для компоновки кода
@@ -138,11 +138,12 @@ class _TheGameWidgetState extends State<TheGameWidget> {
     debugPrint('init state');
     */
   }
+
   //в отдельный метод выделил генерацию поля
   void listGenerate() {
     fieldWidgets = List.generate(
       9,
-          (index) => GridTile(
+      (index) => GridTile(
         child: InkWell(
           enableFeedback: true,
           child: FieldWidget(drawType: field[index]),
@@ -209,7 +210,9 @@ class _TheGameWidgetState extends State<TheGameWidget> {
                 child: const Text('RESET'),
                 onPressed: reset,
               ),
-              const SizedBox(width: 30,),
+              const SizedBox(
+                width: 30,
+              ),
               ElevatedButton(
                 style: ButtonStyles.mainButtonStyle,
                 child: const Text('OPTIONS'),
